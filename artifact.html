@@ -1,0 +1,1045 @@
+<meta charset="utf-8">
+<title>SKILL.md ジェネレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  [hidden] { display: none !important; }
+
+  :root {
+    --paper:      #f4f5f3;
+    --card:       #ffffff;
+    --sunk:       #eceee9;
+    --ink:        #17191b;
+    --ink-mid:    #4e5459;
+    --ink-soft:   #858b8f;
+    --rule:       #dcdfda;
+    --rule-hard:  #c2c7c0;
+    --accent:     #26418f;
+    --accent-sub: #e7ebf6;
+    --ok:         #1c6647;
+    --ok-sub:     #e4f0ea;
+    --warn:       #8a5c12;
+    --warn-sub:   #f7eeda;
+    --bad:        #9d2f21;
+    --bad-sub:    #f8e8e5;
+
+    --display: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", sans-serif;
+    --body: "Noto Sans JP", "Hiragino Sans", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --step: 4px;
+    --radius: 6px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #131517;
+      --card:       #1b1e21;
+      --sunk:       #101214;
+      --ink:        #e9ebe8;
+      --ink-mid:    #a9b0b4;
+      --ink-soft:   #767d82;
+      --rule:       #2c3135;
+      --rule-hard:  #3b4146;
+      --accent:     #93aded;
+      --accent-sub: #1b2437;
+      --ok:         #63c39a;
+      --ok-sub:     #14251d;
+      --warn:       #d6a55c;
+      --warn-sub:   #2a2113;
+      --bad:        #e08878;
+      --bad-sub:    #2c1a17;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #131517;
+    --card:       #1b1e21;
+    --sunk:       #101214;
+    --ink:        #e9ebe8;
+    --ink-mid:    #a9b0b4;
+    --ink-soft:   #767d82;
+    --rule:       #2c3135;
+    --rule-hard:  #3b4146;
+    --accent:     #93aded;
+    --accent-sub: #1b2437;
+    --ok:         #63c39a;
+    --ok-sub:     #14251d;
+    --warn:       #d6a55c;
+    --warn-sub:   #2a2113;
+    --bad:        #e08878;
+    --bad-sub:    #2c1a17;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 20px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ---------------------------------------------------------- 見出し */
+
+  .masthead { display: flex; flex-direction: column; gap: 14px; }
+
+  .masthead-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-sub);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 2px 9px;
+    white-space: nowrap;
+  }
+
+  .lede { margin: 0; color: var(--ink-mid); max-width: 60ch; }
+
+  /* ---------------------------------------------------------- 使い方 */
+
+  .howto {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .howto > div {
+    background: var(--card);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .howto .k {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .howto .v { font-size: 13.5px; line-height: 1.6; color: var(--ink-mid); }
+  .howto .v b { color: var(--ink); font-weight: 500; }
+
+  /* ------------------------------------------------------------ 面 */
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+  }
+
+  .panel-pad { padding: 22px; }
+
+  .notice {
+    border: 1px solid var(--rule-hard);
+    border-left: 3px solid var(--accent);
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    font-size: 13.5px;
+    line-height: 1.75;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .notice h2 {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .notice p { margin: 0; color: var(--ink-mid); }
+
+  /* ---------------------------------------------------------- タブ */
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--rule);
+    padding: 0 22px;
+  }
+
+  .tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* -------------------------------------------------------- 入力欄 */
+
+  form,
+  #guided { display: flex; flex-direction: column; gap: 20px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  .field-head { display: flex; align-items: baseline; gap: 8px; }
+
+  .field-label { font-size: 13.5px; font-weight: 500; }
+
+  .req {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--bad);
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    padding: 0 4px;
+  }
+
+  .hint { font-size: 12.5px; line-height: 1.65; color: var(--ink-soft); }
+
+  textarea {
+    width: 100%;
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule-hard);
+    border-radius: 4px;
+    padding: 10px 12px;
+    resize: vertical;
+  }
+
+  textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  button { font: inherit; cursor: pointer; border-radius: 4px; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .btn-main {
+    background: var(--accent);
+    color: var(--card);
+    border: 1px solid var(--accent);
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--display);
+  }
+
+  :root[data-theme="dark"] .btn-main { color: #10141c; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .btn-main { color: #10141c; }
+  }
+
+  .btn-main:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn-main:disabled { opacity: 0.45; cursor: default; }
+
+  .btn-quiet {
+    background: none;
+    border: 1px solid var(--rule-hard);
+    color: var(--ink-mid);
+    padding: 10px 16px;
+    font-size: 13.5px;
+  }
+
+  .btn-quiet:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  .btn-mini {
+    background: none;
+    border: 1px solid var(--rule-hard);
+    color: var(--ink-mid);
+    padding: 3px 11px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+
+  .btn-mini:hover { color: var(--accent); border-color: var(--accent); }
+  .btn-mini.done { color: var(--ok); border-color: var(--ok); background: var(--ok-sub); }
+
+  .msg-bad {
+    color: var(--bad);
+    background: var(--bad-sub);
+    border: 1px solid var(--bad);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    white-space: pre-line;
+  }
+
+  /* -------------------------------------------------------- 生成中 */
+
+  .working { display: flex; flex-direction: column; gap: 12px; }
+
+  .working-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink-mid);
+  }
+
+  .pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .pulse { animation: none; opacity: 0.8; } }
+
+  .counter {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  details summary {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  .stream {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    background: var(--sunk);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0 0;
+    max-height: 220px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* --------------------------------------------------------- 検査 */
+
+  .check {
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .check b { font-weight: 700; }
+  .check ul { margin: 6px 0 0; padding-left: 18px; }
+  .check.ok   { color: var(--ok);   background: var(--ok-sub);   border-color: var(--ok); }
+  .check.warn { color: var(--warn); background: var(--warn-sub); border-color: var(--warn); }
+  .check.bad  { color: var(--bad);  background: var(--bad-sub);  border-color: var(--bad); }
+
+  /* --------------------------------------------------- 生成物＝ファイル */
+
+  .files { display: flex; flex-direction: column; gap: 18px; }
+
+  .file {
+    border: 1px solid var(--rule-hard);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+  }
+
+  .file-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px 9px 14px;
+    background: var(--sunk);
+    border-bottom: 1px solid var(--rule-hard);
+    flex-wrap: wrap;
+  }
+
+  .file-name {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .file-why {
+    font-size: 12px;
+    color: var(--ink-soft);
+    flex: 1 1 120px;
+    min-width: 0;
+  }
+
+  .file-tools { display: flex; gap: 6px; margin-left: auto; }
+
+  .fence {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .fence::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin: 0;
+    padding: 10px 14px 16px;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ink);
+  }
+
+  pre.fm { padding-bottom: 10px; color: var(--ink-mid); }
+
+  .notes {
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+    font-size: 13px;
+    color: var(--ink-mid);
+    white-space: pre-line;
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+
+  footer code {
+    font-family: var(--mono);
+    font-size: 0.95em;
+    color: var(--ink-mid);
+  }
+
+  @media (max-width: 620px) {
+    .page { padding: 28px 14px 64px; }
+    .howto { grid-template-columns: 1fr; }
+    .panel-pad { padding: 16px; }
+    .tabs { padding: 0 16px; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="masthead-row">
+      <h1>SKILL.md ジェネレーター</h1>
+      <span class="badge">Fable 5.1 専用</span>
+    </div>
+    <p class="lede">
+      質問に答えるか、作りたいものをそのまま書くだけ。Claude Code にそのまま置ける SKILL.md 一式ができます。
+    </p>
+  </header>
+
+  <div class="howto">
+    <div><span class="k">1 / 書く</span><span class="v"><b>質問に答える</b>か、作りたいものをそのまま書く</span></div>
+    <div><span class="k">2 / 作る</span><span class="v">ボタンを押すと <b>Claude が下書き</b>します</span></div>
+    <div><span class="k">3 / 置く</span><span class="v">コピーして <b>.claude/skills/</b> に置けば完了</span></div>
+  </div>
+
+  <div id="offline" class="notice" hidden></div>
+
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab" role="tab" data-mode="guided" aria-selected="true">質問に答える</button>
+      <button type="button" class="tab" role="tab" data-mode="freeform" aria-selected="false">そのまま伝える</button>
+    </div>
+
+    <div class="panel-pad">
+      <form id="form" novalidate>
+        <div id="guided"></div>
+
+        <div id="freeform" hidden>
+          <div class="field">
+            <div class="field-head">
+              <span class="field-label">作りたいものを、思いつくままに書いてください</span>
+            </div>
+            <textarea id="freeText" rows="9" placeholder="例：Premiere Pro から書き出した XML を渡すと、無音の部分を見つけて切ってくれるスキルが欲しい。元のファイルは絶対に触らないでほしい。しきい値は -35dB で、0.2 秒より短い無音は無視。切った箇所の一覧も出してほしい。"></textarea>
+            <span class="hint">箇条書きでも、話し言葉のままでも構いません。</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="go" class="btn-main">SKILL.md を作る</button>
+          <button type="button" id="stop" class="btn-quiet" hidden>中止する</button>
+          <button type="button" id="clear" class="btn-quiet">入力を消す</button>
+        </div>
+
+        <p id="formError" class="msg-bad" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="working" class="panel panel-pad working" hidden>
+    <div class="working-row">
+      <span class="pulse" aria-hidden="true"></span>
+      <span id="workingMsg">考えています…</span>
+      <span class="counter" id="counter"></span>
+    </div>
+    <details>
+      <summary>書いている様子を見る</summary>
+      <pre class="stream" id="stream"></pre>
+    </details>
+  </section>
+
+  <section id="result" class="files" hidden>
+    <div id="check"></div>
+    <div id="files"></div>
+    <div id="notes" class="notes" hidden></div>
+  </section>
+
+  <footer>
+    <p>
+      生成は、このページを開いた人の Claude で行われます。最初の 1 回だけ許可を尋ねます。
+      手元で動かす版（<code>node server.mjs</code> で立ち上げて、生成した一式をフォルダごと書き出せるもの）もあります。
+    </p>
+  </footer>
+
+</div>
+
+<script type="module">
+  const $ = (id) => document.getElementById(id);
+
+  /* ------------------------------------------------ 質問はここ一箇所 */
+
+  const QUESTIONS = [
+    {
+      id: "what",
+      label: "何をするスキルですか",
+      placeholder: "例：Premiere Pro の書き出し XML を読んで、無音部分のカット位置を出す",
+      hint: "一番大事な項目です。動作を一文で。",
+      required: true,
+      rows: 3,
+    },
+    {
+      id: "when",
+      label: "どんなときに発動してほしいですか",
+      placeholder: "例：XML ファイルを渡されたとき、「無音カットして」「ジェットカット」と言われたとき",
+      hint: "Claude はこの条件を見てスキルを起動するか決めます。実際に打ちそうな言い回しを並べてください。",
+      required: true,
+      rows: 3,
+    },
+    {
+      id: "tools",
+      label: "使う道具は何ですか",
+      placeholder: "例：ファイルの読み書き、Python スクリプトの実行、Web 検索",
+      hint: "思いつかなければ空欄で構いません。",
+      required: false,
+      rows: 2,
+    },
+    {
+      id: "io",
+      label: "入力と出力を教えてください",
+      placeholder: "例：入力＝Premiere の XML ファイル / 出力＝カット済みの XML と、切った箇所の一覧",
+      hint: "何を受け取って何を返すか。",
+      required: false,
+      rows: 2,
+    },
+    {
+      id: "rules",
+      label: "絶対に守らせたいことはありますか",
+      placeholder: "例：元のファイルは絶対に上書きしない。カット候補が 500 個を超えたら実行前に確認する。",
+      hint: "過去に失敗した経験があれば、それをそのまま書いてください。",
+      required: false,
+      rows: 3,
+    },
+    {
+      id: "refs",
+      label: "参考にする既存の手順やファイルはありますか",
+      placeholder: "例：~/ClaudeCode/tools/silence_cut.py が既にある。しきい値は -35dB。",
+      hint: "既存の資産があるならここに。無ければ空欄で。",
+      required: false,
+      rows: 3,
+    },
+  ];
+
+  const RULES = `あなたは Claude Code の SKILL.md を書く専門家です。
+利用者の説明を読み、そのまま使える SKILL.md 一式を日本語で作ります。
+
+## SKILL.md の決まり
+
+1. ファイルの先頭は --- で挟んだ frontmatter。入れるのは name と description の 2 つだけ。
+   - name: 半角小文字とハイフンだけ（kebab-case）。64 文字以内。フォルダ名と一致させる。
+   - description: 「何をするか」と「どんなときに発動するか」を必ず両方入れた一文。
+     Claude はこの一行だけを見て起動するかを決めるため、ここが最重要。
+     実際に利用者が打ちそうな言い回し、扱うファイル拡張子、固有名詞を具体的に含める。
+     「便利です」「効率化します」のような効能だけの説明は禁止。
+2. frontmatter の後は本文。見出し（# スキル名）と 1〜2 行の要約、「使う場面」（発動条件の箇条書き）、
+   「手順」（番号つき・そのままなぞれる粒度）、「注意」（壊しやすい所・確認を取るべき所）の順で書く。
+3. 手順は「トリガー → やること」の形で書く。曖昧な形容詞を避け、判断基準は数値か条件式で書く。
+4. 取り消せない操作（削除・上書き・外部送信・公開・課金）を含む手順には、
+   実行前に利用者へ確認を取るステップを必ず入れる。
+5. 本文は 200 行以内に収める。長い参考資料は references/ に、
+   繰り返し実行する処理は scripts/ に切り出し、本文からは参照するだけにする。
+   付随ファイルは多くても 2 つまで。本文だけで足りるなら空配列にする。`;
+
+  const SHAPE = `## 返し方
+
+次の形の JSON だけを返してください。説明や前置きは書かないでください。
+
+{
+  "name": "kebab-case のスキル名",
+  "description": "frontmatter に入れる一文",
+  "skillMd": "--- から始まる SKILL.md の全文",
+  "extraFiles": [{"path": "references/xxx.md", "content": "全文", "purpose": "要る理由を一行で"}],
+  "notes": "使う人へのひとこと。置き場所や事前に必要なものなど。無ければ空文字"
+}`;
+
+  /* ------------------------------------------------------- 入力の検査 */
+
+  const blank = (v) => typeof v !== "string" || v.trim() === "";
+
+  function validateInput(input) {
+    const errors = [];
+    if (input.mode === "guided") {
+      for (const q of QUESTIONS) {
+        if (q.required && blank(input.answers[q.id])) errors.push(`「${q.label}」は必須です。`);
+      }
+    } else {
+      if (blank(input.text)) errors.push("作りたいものの説明を書いてください。");
+      else if (input.text.trim().length < 15) {
+        errors.push("説明が短すぎます。何をするスキルで、いつ動いてほしいかを書いてください。");
+      }
+    }
+    return { ok: errors.length === 0, errors };
+  }
+
+  function buildPrompt(input) {
+    if (input.mode === "freeform") {
+      return [
+        RULES,
+        "",
+        "## 利用者の説明",
+        input.text.trim(),
+        "",
+        "説明に書かれていない項目は、内容から素直に推測して埋めてください。推測で埋めた箇所は notes に挙げてください。",
+        "",
+        SHAPE,
+      ].join("\n");
+    }
+    const filled = QUESTIONS.filter((q) => !blank(input.answers[q.id]))
+      .map((q) => `### ${q.label}\n${input.answers[q.id].trim()}`);
+    const skipped = QUESTIONS.filter((q) => blank(input.answers[q.id])).map((q) => q.label);
+    const lines = [RULES, "", "## 利用者の回答", ...filled];
+    if (skipped.length) {
+      lines.push(
+        "",
+        "## 未回答の項目",
+        `${skipped.join(" / ")} は回答がありません。上の回答から素直に推測して埋め、推測した箇所を notes に挙げてください。`,
+      );
+    }
+    lines.push("", SHAPE);
+    return lines.join("\n");
+  }
+
+  /* ------------------------------------------------------ 生成物の検査 */
+
+  const TRIGGERS = [
+    /とき/, /時に/, /たら/, /なら/, /場合/, /際に/, /際は/,
+    /言われ/, /頼まれ/, /依頼/, /求められ/, /渡され/, /指示され/, /使う/,
+    /\buse when\b/i, /\bwhen\b/i,
+  ];
+  const VAGUE = [/便利/, /効率(化|的|よく|良く)/, /簡単に/, /素早く/, /手軽に/, /快適/, /役立/, /サポートします/];
+  const SPECIFIC = [/\.[a-z0-9]{1,5}\b/i, /\/[a-z][a-z0-9-]{2,}/i, /[A-Za-z][A-Za-z0-9+#.-]{2,}/, /[ァ-ヴー]{3,}/, /\d/];
+  const hit = (list, s) => list.some((re) => re.test(s));
+
+  function checkDescription(d) {
+    const reasons = [], warnings = [];
+    if (typeof d !== "string" || !d.trim()) return { reasons: ["description が空です。"], warnings };
+    const t = d.trim();
+    if (t.length < 20) reasons.push(`description が ${t.length} 文字しかありません。何をするかと、いつ発動するかの両方を入れてください。`);
+    if (t.length > 500) reasons.push(`description が ${t.length} 文字あります。500 文字以内に収めてください。`);
+    else if (t.length > 300) warnings.push(`description が ${t.length} 文字とやや長めです。発動条件に関係ない説明が混ざっていないか見てください。`);
+    if (!hit(TRIGGERS, t)) reasons.push("発動条件が書かれていません。「〜のとき」「〜と言われたら」のように、いつ起動してほしいかを入れてください。");
+    if (!hit(SPECIFIC, t)) warnings.push("扱うファイル・コマンド・固有名詞・数値といった具体的な手がかりがありません。他のスキルと区別がつかず、誤って起動する恐れがあります。");
+    if (hit(VAGUE, t)) warnings.push("「便利」「効率化」のような効能だけの言い回しが入っています。発動条件の判断材料にならないので、具体的な場面の記述に置き換えられないか見てください。");
+    if (/^(この|本)スキル/.test(t)) warnings.push("「このスキルは〜」で始まっています。主語を省いて動作から書き出すと、同じ文字数でより多くの発動条件を入れられます。");
+    return { reasons, warnings };
+  }
+
+  function splitFrontmatter(md) {
+    if (typeof md !== "string" || !md.startsWith("---")) return null;
+    const end = md.indexOf("\n---", 3);
+    if (end === -1) return null;
+    return {
+      fm: md.slice(md.indexOf("\n") + 1, end).trim(),
+      body: md.slice(end + 4).replace(/^\n+/, ""),
+      fields: Object.fromEntries(
+        md.slice(md.indexOf("\n") + 1, end).split("\n")
+          .map((l) => l.match(/^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$/))
+          .filter(Boolean)
+          .map((m) => [m[1], m[2].trim().replace(/^["']|["']$/g, "")]),
+      ),
+    };
+  }
+
+  function safePath(p) {
+    if (typeof p !== "string" || !p.trim()) return false;
+    if (p.startsWith("/") || /^[A-Za-z]:/.test(p) || p.includes("\\")) return false;
+    return !p.split("/").some((s) => s === "" || s === "." || s === "..");
+  }
+
+  function validateSkill(r) {
+    const errors = [], warnings = [];
+    const name = typeof r.name === "string" ? r.name.trim() : "";
+    if (!name) errors.push("name が空です。");
+    else if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) errors.push(`name「${name}」は半角小文字・数字・ハイフンだけで書く決まりです。`);
+    else if (name.length > 64) errors.push(`name が ${name.length} 文字あります。64 文字以内にしてください。`);
+
+    const d = checkDescription(r.description);
+    errors.push(...d.reasons);
+    warnings.push(...d.warnings);
+
+    const md = typeof r.skillMd === "string" ? r.skillMd : "";
+    if (!md.trim()) errors.push("SKILL.md の本文が空です。");
+    else {
+      const parts = splitFrontmatter(md);
+      if (!parts) errors.push("SKILL.md の frontmatter（先頭を --- で挟む部分）が見つかりません。");
+      else {
+        if (!parts.fields.name) errors.push("frontmatter に name がありません。");
+        if (!parts.fields.description) errors.push("frontmatter に description がありません。");
+        if (name && parts.fields.name && parts.fields.name !== name) {
+          errors.push(`frontmatter の name「${parts.fields.name}」と、フォルダ名にする name「${name}」が食い違っています。`);
+        }
+        if (!parts.body.trim()) errors.push("frontmatter の後に本文がありません。");
+      }
+    }
+
+    const seen = new Set();
+    for (const f of Array.isArray(r.extraFiles) ? r.extraFiles : []) {
+      if (!f || !safePath(f.path)) { errors.push(`付随ファイルのパス「${f && f.path}」は使えません。`); continue; }
+      if (seen.has(f.path)) errors.push(`付随ファイルのパス「${f.path}」が重複しています。`);
+      seen.add(f.path);
+      if (typeof f.content !== "string" || !f.content.trim()) errors.push(`付随ファイル「${f.path}」の中身が空です。`);
+    }
+    return { ok: errors.length === 0, errors, warnings };
+  }
+
+  /* -------------------------------------------------------------- 画面 */
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const state = { mode: "guided", result: null, ctl: null, sample: null, downloads: null };
+
+  for (const q of QUESTIONS) {
+    const div = document.createElement("div");
+    div.className = "field";
+    div.innerHTML = `
+      <div class="field-head">
+        <span class="field-label">${esc(q.label)}</span>
+        ${q.required ? '<span class="req">必須</span>' : ""}
+      </div>
+      <textarea id="q-${q.id}" rows="${q.rows}" placeholder="${esc(q.placeholder)}"></textarea>
+      <span class="hint">${esc(q.hint)}</span>`;
+    $("guided").appendChild(div);
+  }
+  function setMode(mode) {
+    state.mode = mode;
+    for (const t of document.querySelectorAll(".tab")) {
+      t.setAttribute("aria-selected", String(t.dataset.mode === mode));
+    }
+    $("guided").hidden = mode !== "guided";
+    $("freeform").hidden = mode !== "freeform";
+    $("formError").hidden = true;
+  }
+
+  for (const t of document.querySelectorAll(".tab")) {
+    t.addEventListener("click", () => setMode(t.dataset.mode));
+  }
+
+  function collect() {
+    if (state.mode === "freeform") return { mode: "freeform", text: $("freeText").value };
+    const answers = {};
+    for (const q of QUESTIONS) answers[q.id] = $(`q-${q.id}`).value;
+    return { mode: "guided", answers };
+  }
+
+  /* ------------------------------------------------------ 生成できるか */
+
+  const OFFLINE_HTML = `
+    <h2>ここでは下書きが作れません</h2>
+    <p>
+      このページは、開いた人の Claude に下書きを頼んで動きます。今はそれが使えない状態です
+      （許可されていないか、Claude の画面の外で開かれています）。
+    </p>
+    <p>
+      下の「貼り付け用のプロンプトを作る」を押すと、<b>そのまま Claude に貼れる指示文</b>ができます。
+      それを Claude Code や Claude のチャットに貼れば、同じ SKILL.md が手に入ります。
+    </p>`;
+
+  function goOffline() {
+    state.sample = null;
+    $("offline").innerHTML = OFFLINE_HTML;
+    $("offline").hidden = false;
+    $("go").textContent = "貼り付け用のプロンプトを作る";
+  }
+
+  // Claude の画面の外で開かれると window.claude ごと存在しない。
+  // 素の参照だと例外でこの下の組み立てが全部止まるので、必ず有無を確かめてから触る。
+  const host = typeof claude !== "undefined" && claude && typeof claude.use === "function" ? claude : null;
+
+  if (host) {
+    host.use("sample").then((s) => { s ? (state.sample = s) : goOffline(); }).catch(goOffline);
+    host.use("downloads").then((d) => { state.downloads = d; }).catch(() => {});
+  } else {
+    goOffline();
+  }
+
+  /* ---------------------------------------------------------- 生成する */
+
+  const ERROR_COPY = {
+    not_granted: "Claude に頼む許可が下りていません。ページを開き直して、確認が出たら「許可」を選んでください。",
+    rate_limited: "短い時間に何度も頼みすぎました。1〜2 分おいてから、もう一度押してください。",
+    invalid_json: "返ってきた下書きが途中で切れていました。回答を少し短くするか、付随ファイルが要らない内容にして、もう一度押してください。",
+    cancelled: "",
+    too_large: "入力が長すぎます。回答を短くしてから、もう一度押してください。",
+  };
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("formError").hidden = true;
+    $("result").hidden = true;
+
+    const input = collect();
+    const check = validateInput(input);
+    if (!check.ok) {
+      $("formError").textContent = check.errors.join("\n");
+      $("formError").hidden = false;
+      return;
+    }
+
+    const prompt = buildPrompt(input);
+
+    if (!state.sample) {
+      showPrompt(prompt);
+      return;
+    }
+
+    state.ctl = new AbortController();
+    $("go").disabled = true;
+    $("stop").hidden = false;
+    $("working").hidden = false;
+    $("workingMsg").textContent = "考えています…";
+    $("stream").textContent = "";
+    $("counter").textContent = "";
+
+    try {
+      const result = await state.sample.json(prompt, {
+        modelTier: "complex",
+        signal: state.ctl.signal,
+        onText: ({ text }) => {
+          $("workingMsg").textContent = "書いています…";
+          $("stream").textContent = text;
+          $("counter").textContent = `${text.length.toLocaleString("ja-JP")} 文字`;
+          $("stream").scrollTop = $("stream").scrollHeight;
+        },
+      });
+      $("working").hidden = true;
+      showResult(result);
+    } catch (err) {
+      $("working").hidden = true;
+      const copy = ERROR_COPY[err && err.code] ?? `うまくいきませんでした：${(err && err.message) || err}`;
+      if (copy) {
+        $("formError").textContent = copy;
+        $("formError").hidden = false;
+      }
+    } finally {
+      $("go").disabled = false;
+      $("stop").hidden = true;
+      state.ctl = null;
+    }
+  });
+
+  $("stop").addEventListener("click", () => state.ctl && state.ctl.abort());
+
+  $("clear").addEventListener("click", () => {
+    for (const ta of document.querySelectorAll("textarea")) ta.value = "";
+    $("formError").hidden = true;
+    $("result").hidden = true;
+  });
+
+  /* ---------------------------------------------------------- 結果表示 */
+
+  function fileBlock(name, why, content, { split = false } = {}) {
+    const el = document.createElement("article");
+    el.className = "file";
+
+    const bar = document.createElement("div");
+    bar.className = "file-bar";
+    bar.innerHTML = `<span class="file-name">${esc(name)}</span>` + (why ? `<span class="file-why">${esc(why)}</span>` : "");
+
+    const tools = document.createElement("div");
+    tools.className = "file-tools";
+
+    const copy = document.createElement("button");
+    copy.type = "button";
+    copy.className = "btn-mini";
+    copy.textContent = "コピー";
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(content);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = content;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      copy.textContent = "コピーしました";
+      copy.classList.add("done");
+      setTimeout(() => { copy.textContent = "コピー"; copy.classList.remove("done"); }, 1600);
+    });
+    tools.appendChild(copy);
+
+    if (state.downloads) {
+      const save = document.createElement("button");
+      save.type = "button";
+      save.className = "btn-mini";
+      save.textContent = "保存";
+      save.addEventListener("click", async () => {
+        try {
+          await state.downloads.save({ filename: name.split("/").pop(), data: content });
+        } catch { /* 断られたら何もしない */ }
+      });
+      tools.appendChild(save);
+    }
+
+    bar.appendChild(tools);
+    el.appendChild(bar);
+
+    const parts = split ? splitFrontmatter(content) : null;
+    if (parts) {
+      const fmLabel = document.createElement("div");
+      fmLabel.className = "fence";
+      fmLabel.textContent = "frontmatter";
+      const fmPre = document.createElement("pre");
+      fmPre.className = "fm";
+      fmPre.textContent = parts.fm;
+      const bodyLabel = document.createElement("div");
+      bodyLabel.className = "fence";
+      bodyLabel.textContent = "本文";
+      const bodyPre = document.createElement("pre");
+      bodyPre.textContent = parts.body;
+      el.append(fmLabel, fmPre, bodyLabel, bodyPre);
+    } else {
+      const pre = document.createElement("pre");
+      pre.textContent = content;
+      el.appendChild(pre);
+    }
+    return el;
+  }
+
+  function showResult(r) {
+    state.result = r;
+    const v = validateSkill(r || {});
+    const box = document.createElement("div");
+    if (v.errors.length) {
+      box.className = "check bad";
+      box.innerHTML = `<b>直したほうがよい点が ${v.errors.length} 件あります。</b><ul>${v.errors.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    } else if (v.warnings.length) {
+      box.className = "check warn";
+      box.innerHTML = `<b>そのまま使えますが、${v.warnings.length} 件見ておくとよい点があります。</b><ul>${v.warnings.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    } else {
+      box.className = "check ok";
+      box.textContent = "検査を通りました。そのまま使えます。";
+    }
+    $("check").replaceChildren(box);
+
+    const files = [fileBlock(`${r.name || "skill"}/SKILL.md`, "", r.skillMd || "", { split: true })];
+    for (const f of Array.isArray(r.extraFiles) ? r.extraFiles : []) {
+      if (f && safePath(f.path)) files.push(fileBlock(`${r.name || "skill"}/${f.path}`, f.purpose || "", f.content || ""));
+    }
+    $("files").replaceChildren(...files);
+
+    if (r.notes && String(r.notes).trim()) {
+      $("notes").textContent = String(r.notes).trim();
+      $("notes").hidden = false;
+    } else {
+      $("notes").hidden = true;
+    }
+
+    $("result").hidden = false;
+    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function showPrompt(prompt) {
+    $("check").replaceChildren();
+    $("files").replaceChildren(fileBlock("Claude に貼るプロンプト", "コピーして Claude Code のチャットに貼ってください", prompt));
+    $("notes").hidden = true;
+    $("result").hidden = false;
+    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  setMode("guided");
+</script>

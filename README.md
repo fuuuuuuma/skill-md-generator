@@ -97,6 +97,18 @@ node --test test/*.test.mjs
 
 `test/fake-claude.mjs` が本物の代わりに動くので、テストで課金は発生しません。
 
+## 共有できる版（artifact.html）
+
+`artifact.html` は、リンクを知っている人だけが開ける claude.ai の共有ページとして公開した 1 枚版。
+裏で Claude CLI を起動する代わりに、**開いた人自身の Claude** に下書きを頼む（`claude.use("sample")`）。
+そのため CLI もインストールも要らず、リンクを渡せばそのまま使える。
+
+https://claude.ai/code/artifact/b7cd94d5-1433-4886-959c-9fcfda6bd0b1
+
+- 質問・書き方の指示・検査ロジックは `public/shared/` と同じ内容を 1 ファイルに畳んだもの
+- 生成した各ファイルはコピーのほか、`claude.use("downloads")` で 1 つずつ保存できる
+- Claude の画面の外で開かれた場合は、貼り付け用のプロンプトを出す版に自動で切り替わる
+
 ## 公開版について
 
 `public/` を静的サイトとして出すと、生成なしのお試し版になります。
