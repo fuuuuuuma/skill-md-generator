@@ -1,0 +1,14 @@
+{
+  "name": "skill-md-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "質問に答えるか、作りたいものをそのまま書くだけで SKILL.md 一式を生成するローカル Web アプリ",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

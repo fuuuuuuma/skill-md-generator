@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SKILL.md ジェネレーター</title>
+    <meta
+      name="description"
+      content="質問に答えるか、作りたいものをそのまま書くだけで、Claude Code にそのまま貼れる SKILL.md 一式を作ります。"
+    />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <div class="head-top">
+          <h1>SKILL.md ジェネレーター</h1>
+          <span class="badge">Fable 5.1 専用</span>
+        </div>
+        <p class="lead">
+          質問に答えるか、作りたいものをそのまま書くだけ。<br />
+          Claude Code にそのまま貼れる SKILL.md 一式ができます。
+        </p>
+      </header>
+
+      <section class="howto" aria-label="使い方">
+        <ol>
+          <li><b>書く</b><span>質問に答えるか、作りたいものをそのまま書く</span></li>
+          <li><b>作る</b><span>ボタンを押すと裏で Claude が下書きします</span></li>
+          <li><b>置く</b><span>コピーして <code>.claude/skills/</code> に置けば完了</span></li>
+        </ol>
+      </section>
+
+      <div id="modeNote" class="note" hidden></div>
+
+      <section class="card">
+        <div class="tabs" role="tablist">
+          <button type="button" class="tab is-on" role="tab" data-mode="guided">質問に答える</button>
+          <button type="button" class="tab" role="tab" data-mode="freeform">そのまま伝える</button>
+        </div>
+
+        <form id="form" novalidate>
+          <div id="guidedPane" class="pane"></div>
+
+          <div id="freeformPane" class="pane" hidden>
+            <label class="field">
+              <span class="field-label">作りたいものを、思いつくままに書いてください</span>
+              <textarea
+                id="freeText"
+                rows="10"
+                placeholder="例：Premiere Pro から書き出した XML を渡すと、無音の部分を見つけて切ってくれるスキルが欲しい。元のファイルは絶対に触らないでほしい。しきい値は -35dB で、0.2 秒より短い無音は無視。切った箇所の一覧も出してほしい。"
+              ></textarea>
+              <span class="field-hint">箇条書きでも、話し言葉のままでも構いません。</span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="submit" id="submitBtn" class="primary">SKILL.md を作る</button>
+            <button type="button" id="resetBtn" class="ghost">入力を消す</button>
+          </div>
+          <p id="formError" class="error" hidden></p>
+        </form>
+      </section>
+
+      <section id="progress" class="card" hidden>
+        <div class="progress-head">
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="progressMsg">作っています…</span>
+        </div>
+        <details id="logBox">
+          <summary>詳しい様子を見る</summary>
+          <pre id="log"></pre>
+        </details>
+      </section>
+
+      <section id="result" class="card" hidden>
+        <div id="checkBox"></div>
+
+        <div class="result-head">
+          <h2>SKILL.md</h2>
+          <div class="result-meta">
+            <code id="skillName"></code>
+            <button type="button" class="copy" data-copy="skillMd">コピー</button>
+          </div>
+        </div>
+        <pre class="code"><code id="skillMd"></code></pre>
+
+        <div id="extras"></div>
+
+        <div id="notesBox" class="note note-plain" hidden></div>
+
+        <div id="writeBox" class="write" hidden>
+          <h3>一式をパソコンに書き出す</h3>
+          <p class="write-hint">
+            入れた場所の下に <code id="writeDirPreview">スキル名</code> というフォルダを作り、
+            SKILL.md と付随ファイルをまとめて置きます。
+          </p>
+          <div class="write-row">
+            <input
+              id="writeDir"
+              type="text"
+              spellcheck="false"
+              placeholder="~/ClaudeCode/.claude/skills"
+              value="~/.claude/skills"
+            />
+            <button type="button" id="writeBtn" class="primary">ここに書き出す</button>
+          </div>
+          <p id="writeMsg" class="write-msg" hidden></p>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <p>
+          生成は Claude Code の CLI を通して行われます。裏で <code>claude</code> が動くため、
+          このページで実際に作れるのは自分のパソコンで起動したときだけです。
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
