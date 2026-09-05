@@ -3,7 +3,16 @@
 質問に答えるか、作りたいものをそのまま書くだけで、Claude Code に置ける
 **SKILL.md 一式**（本体＋ `references/` や `scripts/` の付随ファイル）を作るローカル Web アプリです。
 
-裏で Claude Code の CLI（`claude`）を起動して生成します。**依存パッケージはありません。**
+## ブラウザで使う（インストール不要）
+
+**https://fuuuuuuma.github.io/skill-md-generator/**
+
+開いて質問に答えるだけです。既定では、そのまま Claude や ChatGPT に貼れる指示文ができます。
+Anthropic の API キーを入れると、そのページの中で SKILL.md まで作りきります
+（キーはブラウザの中だけに保存され、Anthropic 以外には送られません）。
+
+下の `server.mjs` は、手元の `claude` コマンドを使い、生成した一式をフォルダごと
+書き出せる版です。**依存パッケージはありません。**
 
 ## 何が出てくるか
 
@@ -50,7 +59,7 @@ description: Premiere Pro の書き出し XML（FCP7/XMEML 形式の .xml）を�
 
 ---
 
-## はじめかた
+## 手元で動かす
 
 ```bash
 git clone https://github.com/fuuuuuuma/skill-md-generator.git
@@ -99,6 +108,8 @@ public/shared/          画面とサーバの両方から読む共通部分
   schema.mjs              Claude に強制する出力の型
   validate.mjs            生成結果の検査
 artifact.html           claude.ai の共有ページ用に 1 枚へ畳んだ版（後述）
+docs/                   GitHub Pages で配る版。shared/ は public/ からの写し
+tools/build-pages.mjs   docs/ を public/ と同期する（手で書き換えない）
 test/                   node --test 用。偽の claude を使うので課金されない
 ```
 
@@ -157,7 +168,8 @@ errors の少ない方を採用して画面に警告を出します。
 node --test test/*.test.mjs
 ```
 
-44 件。`test/fake-claude.mjs` が本物の `claude` の代わりに動くので、テストで課金は発生しません。
+50 件。`test/fake-claude.mjs` が本物の `claude` の代わりに動くので、テストで課金は発生しません。
+`docs/` が `public/` とズレていないかも、このテストが見張っています。
 
 ## claude.ai の共有ページとして配る（artifact.html）
 

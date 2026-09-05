@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SKILL.md ジェネレーター</title>
+    <meta name="description" content="質問に答えるだけで、Claude Code にそのまま置ける SKILL.md 一式を作ります。インストール不要。" />
+    <meta property="og:title" content="SKILL.md ジェネレーター" />
+    <meta property="og:description" content="質問に答えるだけで、Claude Code にそのまま置ける SKILL.md 一式を作ります。インストール不要。" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+    <style>
+      /* 公開ページだけで使う追加分。共通の見た目は style.css を読む。 */
+      .ways {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .way {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 13px 15px;
+        background: var(--card);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .way.is-on {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+      .way b { font-size: 13.5px; }
+      .way span { font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; }
+      .key-panel {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding-top: 16px;
+      }
+      .key-panel summary {
+        font-size: 13px;
+        color: var(--ink-soft);
+        cursor: pointer;
+      }
+      .key-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 12px 0 8px;
+      }
+      .key-row input {
+        flex: 1 1 260px;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+      .key-note { font-size: 12.5px; color: var(--ink-soft); margin: 0; line-height: 1.7; }
+      .key-state { font-size: 12.5px; margin: 8px 0 0; }
+      .key-state.on { color: var(--accent); }
+      .key-state.off { color: var(--bad); }
+      .handoff {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      @media (max-width: 560px) {
+        .ways { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <div class="head-top">
+          <h1>SKILL.md ジェネレーター</h1>
+          <span class="badge">Fable 5.1 専用</span>
+        </div>
+        <p class="lead">
+          質問に答えるか、作りたいものをそのまま書くだけ。<br />
+          Claude Code にそのまま置ける SKILL.md 一式ができます。<b>インストールは要りません。</b>
+        </p>
+      </header>
+
+      <section class="howto" aria-label="使い方">
+        <ol>
+          <li><b>書く</b><span>質問に答えるか、作りたいものをそのまま書く</span></li>
+          <li><b>作る</b><span>ボタンを押す</span></li>
+          <li><b>置く</b><span>コピーして <code>.claude/skills/</code> に置けば完了</span></li>
+        </ol>
+      </section>
+
+      <div class="ways">
+        <div class="way is-on" id="wayPaste">
+          <b>そのまま使う</b>
+          <span>できた指示文を、いつも使っている Claude や ChatGPT に貼るだけ。準備は要りません。</span>
+        </div>
+        <div class="way" id="wayAuto">
+          <b>その場で仕上げる</b>
+          <span>Anthropic の API キーを入れると、このページの中で SKILL.md まで作りきります。</span>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="tabs" role="tablist">
+          <button type="button" class="tab is-on" role="tab" data-mode="guided">質問に答える</button>
+          <button type="button" class="tab" role="tab" data-mode="freeform">そのまま伝える</button>
+        </div>
+
+        <form id="form" novalidate>
+          <div id="guidedPane" class="pane"></div>
+
+          <div id="freeformPane" class="pane" hidden>
+            <label class="field">
+              <span class="field-label">作りたいものを、思いつくままに書いてください</span>
+              <textarea id="freeText" rows="9" placeholder="例：Premiere Pro から書き出した XML を渡すと、無音の部分を見つけて切ってくれるスキルが欲しい。元のファイルは絶対に触らないでほしい。しきい値は -35dB で、0.2 秒より短い無音は無視。切った箇所の一覧も出してほしい。"></textarea>
+              <span class="field-hint">箇条書きでも、話し言葉のままでも構いません。</span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="submit" id="submitBtn" class="primary">貼り付け用の指示文を作る</button>
+            <button type="button" id="stopBtn" class="ghost" hidden>中止する</button>
+            <button type="button" id="resetBtn" class="ghost">入力を消す</button>
+          </div>
+          <p id="formError" class="error" hidden></p>
+
+          <details class="key-panel" id="keyPanel">
+            <summary>API キーを入れて、その場で仕上げる（任意）</summary>
+            <div class="key-row">
+              <input id="apiKey" type="password" spellcheck="false" autocomplete="off" placeholder="sk-ant-..." />
+              <button type="button" id="saveKey" class="primary">使う</button>
+              <button type="button" id="clearKey" class="ghost">消す</button>
+            </div>
+            <p class="key-note">
+              キーは <b>このブラウザの中だけ</b>に保存され、Anthropic 以外のどこにも送られません（このページに裏側のサーバはありません）。
+              費用はキーの持ち主に請求されます。目安は 1 回 $0.5〜1.0 です。
+              キーは <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Anthropic のコンソール</a>で作れます。
+            </p>
+            <p class="key-state off" id="keyState">まだ設定されていません。</p>
+          </details>
+        </form>
+      </section>
+
+      <section id="progress" class="card" hidden>
+        <div class="progress-head">
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="progressMsg">考えています…</span>
+          <span id="counter" style="margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)"></span>
+        </div>
+        <details id="logBox">
+          <summary>書いている様子を見る</summary>
+          <pre id="log"></pre>
+        </details>
+      </section>
+
+      <section id="result" class="card" hidden>
+        <div id="checkBox"></div>
+
+        <div class="handoff" id="handoff" hidden>
+          <button type="button" class="primary" id="openClaude">コピーして Claude を開く</button>
+          <button type="button" class="ghost" id="openGpt">コピーして ChatGPT を開く</button>
+        </div>
+
+        <div class="result-head">
+          <h2 id="resultTitle">SKILL.md</h2>
+          <div class="result-meta">
+            <code id="skillName"></code>
+            <button type="button" class="copy" data-copy="skillMd">コピー</button>
+          </div>
+        </div>
+        <pre class="code"><code id="skillMd"></code></pre>
+
+        <div id="extras"></div>
+        <div id="notesBox" class="note note-plain" hidden></div>
+      </section>
+
+      <footer class="foot">
+        <p>
+          手元で動かす版（<code>claude</code> コマンドを使い、一式をフォルダごと書き出せるもの）は
+          <a href="https://github.com/fuuuuuuma/skill-md-generator" target="_blank" rel="noopener noreferrer">GitHub</a> にあります。MIT ライセンス。
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
