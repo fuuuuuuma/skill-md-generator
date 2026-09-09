@@ -1,0 +1,11 @@
+{
+  "name": "skill-md-generator",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "server",
+      "command": "npm start",
+      "description": "SKILL.md ジェネレーターのローカルサーバ（node server.mjs）。http://127.0.0.1:7788 で待ち受けます。"
+    }
+  ]
+}
